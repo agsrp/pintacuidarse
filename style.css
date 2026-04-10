@@ -122,20 +122,54 @@ body::after {
 header {
     padding: var(--spacing-md) 0;
     text-align: center;
-    margin-bottom: var(--spacing-md);
+    padding-bottom: 10px;
 }
 
 .logo-placeholder {
-    display: inline-flex;
+    display: flex;
     justify-content: center;
     align-items: center;
+    gap: 3rem;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.logo-placeholder img {
-    width: 100%;
-    max-width: 220px;
-    height: auto;
+.header-logo-primary {
+    height: 115px;
+    width: auto;
+    max-width: 50%;
     object-fit: contain;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+}
+
+.header-logo-secondary {
+    height: 80px;
+    width: auto;
+    max-width: 40%;
+    object-fit: contain;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+}
+
+.header-logo-primary:hover,
+.header-logo-secondary:hover {
+    transform: scale(1.05) translateY(-2px);
+}
+
+@media (max-width: 480px) {
+    .logo-placeholder {
+        gap: 1.5rem;
+    }
+
+    .header-logo-primary {
+        height: 48px;
+    }
+
+    .header-logo-secondary {
+        height: 38px;
+    }
 }
 
 main {
