@@ -12,6 +12,8 @@
 </head>
 
 <body>
+    <canvas id="confetti-canvas"></canvas>
+    <div id="particles-container"></div>
     <div class="container">
         <header>
             <div class="logo-placeholder"><img
@@ -20,7 +22,18 @@
         </header>
 
         <main>
-            <div class="card">
+                    <div class="card">
+            <!-- Game HUD -->
+            <div id="game-hud" class="game-hud">
+                <div class="lives-container" id="lives-container">
+                    <span class="heart active">❤️</span>
+                    <span class="heart active">❤️</span>
+                    <span class="heart active">❤️</span>
+                </div>
+                <div class="timer-wrapper">
+                    <div class="timer-fill" id="timer-fill"></div>
+                </div>
+            </div>
                 <div class="question-number">Pregunta <span id="current-question">1</span> de <span
                         id="total-questions">6</span></div>
                 <h2 class="question-text" id="question-text">Cargando pregunta...</h2>
