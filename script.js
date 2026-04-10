@@ -330,20 +330,31 @@ function initQuiz() {
 function showQuestion() {
     const question = currentQuizData[currentQuestionIndex];
 
-    // Update question text
+    // Update question text and number
     questionTextElement.textContent = question.question;
-
-    // Update question number
     currentQuestionElement.textContent = currentQuestionIndex + 1;
 
     // Update progress bar
     const progressPercentage = ((currentQuestionIndex) / currentQuizData.length) * 100;
     progressFill.style.width = `${progressPercentage}%`;
 
-    // Clear previous options
-    optionsContainer.innerHTML = '';
+    // Reset feedback
+    feedbackElement.textContent = '';
+    answered = false;
 
-    // Create option buttons
+    // Stop any running timer from previous question (don't start new one yet)
+    clearInterval(timerInterval);
+    timeLeft = timeLeftPerQuestion;
+    timerFill.textContent = timeLeft;
+    if (timerWrapper) timerWrapper.classList.remove('danger');
+
+    // --- PHASE 1: Show question large, hide options ---
+    questionTextElement.classList.add('question-preview');
+    optionsContainer.innerHTML = '';
+    optionsContainer.classList.remove('options-reveal');
+    optionsContainer.classList.add('options-hidden');
+
+    // Pre-render option buttons (hidden, so layout is ready)
     question.options.forEach((option, index) => {
         const button = document.createElement('button');
         button.classList.add('option-btn');
@@ -352,32 +363,35 @@ function showQuestion() {
         optionsContainer.appendChild(button);
     });
 
-    // Reset feedback
-    feedbackElement.textContent = '';
-    answered = false;
+    // --- PHASE 2: After 3 seconds, reveal options and start timer ---
+    setTimeout(() => {
+        // Transition question back to normal size
+        questionTextElement.classList.remove('question-preview');
 
-    // Timer reset
-    clearInterval(timerInterval);
-    timeLeft = timeLeftPerQuestion;
-    timerFill.textContent = timeLeft;
-    if (timerWrapper) timerWrapper.classList.remove('danger');
+        // Reveal options with animation
+        optionsContainer.classList.remove('options-hidden');
+        optionsContainer.classList.add('options-reveal');
 
-    timerInterval = setInterval(() => {
-        if (answered) {
-            clearInterval(timerInterval);
-            return;
-        }
-        timeLeft--;
+        // Now start the countdown timer
+        timeLeft = timeLeftPerQuestion;
         timerFill.textContent = timeLeft;
-        if (timeLeft <= 5 && timerWrapper) {
-            timerWrapper.classList.add('danger');
-        }
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            timerFill.textContent = "0";
-            selectOption(-1, null); // Time's up!
-        }
-    }, 1000);
+        timerInterval = setInterval(() => {
+            if (answered) {
+                clearInterval(timerInterval);
+                return;
+            }
+            timeLeft--;
+            timerFill.textContent = timeLeft;
+            if (timeLeft <= 5 && timerWrapper) {
+                timerWrapper.classList.add('danger');
+            }
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerFill.textContent = "0";
+                selectOption(-1, null); // Time's up!
+            }
+        }, 1000);
+    }, 3000);
 }
 
 // Handle option selection
@@ -403,7 +417,7 @@ function selectOption(optionIndex, selectedOption) {
             h.classList.remove('active');
             h.classList.add('lost');
         });
-        feedbackElement.textContent = '⏰ ¡Se acabó el tiempo!';
+        feedbackElement.textContent = '⏰ ¡Se terminó el tiempo!';
         feedbackElement.style.color = '#dc2626';
         buttons.forEach((btn) => {
             if (btn.textContent === correctAnswer) {
@@ -429,12 +443,22 @@ function selectOption(optionIndex, selectedOption) {
     }
 
     // Sound and Gamification
+    const flashEl = document.getElementById('answer-flash');
     if (isCorrect) {
         playSound('correct');
-        document.body.classList.add('state-correct');
+        if (flashEl) {
+            // Reset to allow re-triggering the animation
+            flashEl.classList.remove('flash-correct', 'flash-incorrect');
+            void flashEl.offsetWidth; // force reflow
+            flashEl.classList.add('flash-correct');
+        }
     } else {
         playSound('incorrect');
-        document.body.classList.add('state-incorrect');
+        if (flashEl) {
+            flashEl.classList.remove('flash-correct', 'flash-incorrect');
+            void flashEl.offsetWidth; // force reflow
+            flashEl.classList.add('flash-incorrect');
+        }
         lives--;
         if (lives >= 0 && hearts[lives]) {
             hearts[lives].classList.remove('active');
@@ -443,9 +467,12 @@ function selectOption(optionIndex, selectedOption) {
     }
 
     setTimeout(() => {
+        if (flashEl) {
+            flashEl.classList.remove('flash-correct', 'flash-incorrect');
+        }
         document.body.classList.remove('state-correct');
         document.body.classList.remove('state-incorrect');
-    }, 1000);
+    }, 1300);
 
     // Move to next question after delay
     setTimeout(() => {
@@ -474,12 +501,12 @@ function showResults(gameOver = false) {
 
     if (gameOver) {
         playSound('incorrect');
-        document.querySelector('#results-screen h2').textContent = '¡Juego Terminado!';
-        feedbackElement.textContent = 'Te has quedado sin corazones.';
+        document.querySelector('#results-screen h2').textContent = '¡Juego terminado!';
+        feedbackElement.textContent = 'Te quedaste sin corazones.';
     } else {
         playSound('win');
         triggerConfetti();
-        document.querySelector('#results-screen h2').textContent = '¡Trivia Completada!';
+        document.querySelector('#results-screen h2').textContent = '¡Trivia completada!';
     }
 
     correctCountElement.textContent = correctAnswers;

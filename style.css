@@ -576,28 +576,103 @@ footer {
     }
 }
 
-/* Background state transitions */
-body::before {
-    content: '';
+/* Background state transitions - answer flash overlay */
+#answer-flash {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -2;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    -webkit-transition: opacity 0.1s ease;
+    transition: opacity 0.1s ease;
 }
 
-body.state-correct::before {
-    background: linear-gradient(135deg, rgba(40, 167, 69, 0.8) 0%, rgba(30, 126, 52, 0.8) 100%);
-    opacity: 1;
+/* Keyframe animation: flash green/red and fade out */
+@-webkit-keyframes flashCorrect {
+    0% {
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
-body.state-incorrect::before {
-    background: linear-gradient(135deg, rgba(220, 53, 69, 0.8) 0%, rgba(167, 29, 42, 0.8) 100%);
-    opacity: 1;
+@keyframes flashCorrect {
+    0% {
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes flashIncorrect {
+    0% {
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes flashIncorrect {
+    0% {
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+#answer-flash.flash-correct {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.55) 0%, rgba(22, 163, 74, 0.45) 100%);
+    -webkit-animation: flashCorrect 1.2s ease forwards;
+    animation: flashCorrect 1.2s ease forwards;
+}
+
+#answer-flash.flash-incorrect {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.55) 0%, rgba(185, 28, 28, 0.45) 100%);
+    -webkit-animation: flashIncorrect 1.2s ease forwards;
+    animation: flashIncorrect 1.2s ease forwards;
 }
 
 /* 100% visible area layout */
@@ -743,4 +818,103 @@ main {
     background-color: rgba(239, 68, 68, 0.8);
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
     transform: scale(1.02);
+}
+
+/* =============================================
+   QUESTION PREVIEW PHASE
+   ============================================= */
+
+/* Question text appears large while options are hidden */
+#question-text.question-preview {
+    font-size: clamp(1.35rem, 4.5vw, 2rem);
+    text-align: center;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    min-height: 160px;
+    padding: 1.5rem 1rem;
+    line-height: 1.5;
+    -webkit-transition: font-size 0.4s ease, min-height 0.4s ease;
+    transition: font-size 0.4s ease, min-height 0.4s ease;
+}
+
+/* Options container hidden during preview */
+#options-container.options-hidden {
+    visibility: hidden;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Options slide up and fade in when revealed */
+@-webkit-keyframes optionsReveal {
+    from {
+        opacity: 0;
+        -webkit-transform: translateY(20px);
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+    }
+}
+
+@keyframes optionsReveal {
+    from {
+        opacity: 0;
+        -webkit-transform: translateY(20px);
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+    }
+}
+
+#options-container.options-reveal {
+    visibility: visible;
+    opacity: 1;
+    max-height: 2000px;
+    overflow: visible;
+    pointer-events: auto;
+    -webkit-animation: optionsReveal 0.45s ease forwards;
+    animation: optionsReveal 0.45s ease forwards;
+}
+
+/* Each option button staggers in */
+#options-container.options-reveal .option-btn:nth-child(1) {
+    -webkit-animation-delay: 0.00s;
+    animation-delay: 0.00s;
+}
+
+#options-container.options-reveal .option-btn:nth-child(2) {
+    -webkit-animation-delay: 0.08s;
+    animation-delay: 0.08s;
+}
+
+#options-container.options-reveal .option-btn:nth-child(3) {
+    -webkit-animation-delay: 0.16s;
+    animation-delay: 0.16s;
+}
+
+#options-container.options-reveal .option-btn:nth-child(4) {
+    -webkit-animation-delay: 0.24s;
+    animation-delay: 0.24s;
+}
+
+#options-container.options-reveal .option-btn {
+    opacity: 0;
+    -webkit-animation: optionsReveal 0.4s ease forwards;
+    animation: optionsReveal 0.4s ease forwards;
 }
