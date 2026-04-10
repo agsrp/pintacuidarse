@@ -22,18 +22,36 @@
         </header>
 
         <main>
-                    <div class="card">
-            <!-- Game HUD -->
-            <div id="game-hud" class="game-hud">
-                <div class="lives-container" id="lives-container">
-                    <span class="heart active">❤️</span>
-                    <span class="heart active">❤️</span>
-                    <span class="heart active">❤️</span>
-                </div>
-                <div class="timer-wrapper">
-                    <div class="timer-fill" id="timer-fill"></div>
+            <div class="difficulty-selection card" id="difficulty-screen">
+                <h2>Selecciona la Dificultad</h2>
+                <div class="difficulty-options">
+                    <button class="difficulty-btn easy" data-mode="easy">
+                        <h3>🟢 Fácil</h3>
+                        <p>5 Vidas | 20s por pregunta</p>
+                    </button>
+                    <button class="difficulty-btn medium" data-mode="medium">
+                        <h3>🟡 Intermedio</h3>
+                        <p>3 Vidas | 15s por pregunta</p>
+                    </button>
+                    <button class="difficulty-btn hard" data-mode="hard">
+                        <h3>🔴 Difícil</h3>
+                        <p>2 Vidas | 10s por pregunta</p>
+                    </button>
                 </div>
             </div>
+
+            <div class="card" id="quiz-card" style="display: none;">
+                <!-- Game HUD -->
+                <div id="game-hud" class="game-hud">
+                    <div class="lives-container" id="lives-container">
+                        <span class="heart active">❤️</span>
+                        <span class="heart active">❤️</span>
+                        <span class="heart active">❤️</span>
+                    </div>
+                    <div class="timer-wrapper">
+                        <div class="timer-fill" id="timer-fill"></div>
+                    </div>
+                </div>
                 <div class="question-number">Pregunta <span id="current-question">1</span> de <span
                         id="total-questions">6</span></div>
                 <h2 class="question-text" id="question-text">Cargando pregunta...</h2>

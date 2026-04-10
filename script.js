@@ -176,7 +176,10 @@ const totalCountElement = document.getElementById('total-count');
 const restartBtn = document.getElementById('restart-btn');
 
 // Gamification DOM
-const hearts = document.querySelectorAll('#lives-container .heart');
+let hearts = [];
+const livesContainer = document.getElementById('lives-container');
+const difficultyScreen = document.getElementById('difficulty-screen');
+const quizCard = document.getElementById('quiz-card');
 const timerFill = document.getElementById('timer-fill');
 const timerWrapper = document.querySelector('.timer-wrapper');
 
@@ -185,12 +188,23 @@ let currentQuizData = [];
 let currentQuestionIndex = 0;
 let answered = false;
 let correctAnswers = 0;
-const QUESTIONS_PER_SESSION = 6;
+let questionsPerSession = 6;
+let totalLives = 3;
+let timeLeftPerQuestion = 15;
 
 // Gamification State
-let lives = 3;
+let lives = totalLives;
+livesContainer.innerHTML = "";
+hearts = [];
+for (let i = 0; i < totalLives; i++) {
+    const heart = document.createElement("span");
+    heart.className = "heart active";
+    heart.textContent = "❤️";
+    livesContainer.appendChild(heart);
+    hearts.push(heart);
+}
 let timerInterval;
-let timeLeft = 15;
+let timeLeft = timeLeftPerQuestion;
 let audioCtx;
 
 function playSound(type) {
@@ -299,7 +313,7 @@ function initQuiz() {
     const shuffledQuestions = shuffleArray(allQuestions);
 
     // 2. Pick the first 6 questions for this session
-    currentQuizData = shuffledQuestions.slice(0, QUESTIONS_PER_SESSION);
+    currentQuizData = shuffledQuestions.slice(0, questionsPerSession);
 
     // 3. Shuffle options for each selected question
     currentQuizData = currentQuizData.map(q => ({
@@ -344,7 +358,7 @@ function showQuestion() {
 
     // Timer reset
     clearInterval(timerInterval);
-    timeLeft = 15;
+    timeLeft = timeLeftPerQuestion;
     timerFill.textContent = timeLeft;
     if (timerWrapper) timerWrapper.classList.remove('danger');
 
@@ -442,7 +456,7 @@ function selectOption(optionIndex, selectedOption) {
 
         currentQuestionIndex++;
 
-        if (currentQuestionIndex < currentQuizData.length) {
+        if (currentQuestionIndex < questionsPerSession) {
             showQuestion();
         } else {
             // Show results screen
@@ -453,7 +467,7 @@ function selectOption(optionIndex, selectedOption) {
 
 // Show results screen
 function showResults(gameOver = false) {
-    document.querySelector('.card').style.display = 'none';
+    quizCard.style.display = 'none';
     resultsScreen.style.display = 'block';
 
     clearInterval(timerInterval);
@@ -478,10 +492,19 @@ function restartQuiz() {
     correctAnswers = 0;
     currentQuizData = [];
     resultsScreen.style.display = 'none';
-    document.querySelector('.card').style.display = 'block';
+    quizCard.style.display = 'block';
 
     // Gamification resets
-    lives = 3;
+    lives = totalLives;
+    livesContainer.innerHTML = "";
+    hearts = [];
+    for (let i = 0; i < totalLives; i++) {
+        const heart = document.createElement("span");
+        heart.className = "heart active";
+        heart.textContent = "❤️";
+        livesContainer.appendChild(heart);
+        hearts.push(heart);
+    }
     hearts.forEach(h => {
         h.classList.remove('lost');
         h.classList.add('active');
@@ -493,10 +516,39 @@ function restartQuiz() {
 
 
 // Event listeners
-restartBtn.addEventListener('click', restartQuiz);
+restartBtn.addEventListener('click', () => {
+    resultsScreen.style.display = 'none';
+    difficultyScreen.style.display = 'block';
+});
 
 // Start the quiz when page loads
+
+// Difficulty selection
+document.querySelectorAll('.difficulty-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const mode = e.currentTarget.getAttribute('data-mode');
+        if (mode === 'easy') {
+            totalLives = 5;
+            timeLeftPerQuestion = 20;
+            questionsPerSession = 5;
+        } else if (mode === 'medium') {
+            totalLives = 3;
+            timeLeftPerQuestion = 15;
+            questionsPerSession = 6;
+        } else if (mode === 'hard') {
+            totalLives = 2;
+            timeLeftPerQuestion = 10;
+            questionsPerSession = 10;
+        }
+        difficultyScreen.style.display = 'none';
+        quizCard.style.display = 'block';
+        restartQuiz();
+    });
+});
+
 window.onload = () => {
-    initQuiz();
+    difficultyScreen.style.display = 'block';
+    quizCard.style.display = 'none';
     createParticles();
 };
+
